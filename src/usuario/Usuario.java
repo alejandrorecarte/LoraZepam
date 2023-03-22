@@ -44,11 +44,36 @@ public class Usuario {
         this.telefono = telefono;
     }
 
-    public static void crearUsuario(String nombreUsuario, String hashedContrasenya, String email, int telefono) throws SQLException {
-        PreparedStatement preparedStatement = conexion.prepareStatement("" +
-                "CREATE USER "+nombreUsuario+" IDENTIFIED BY '"+hashedContrasenya+"';" +
-                "GRANT ALL PRIVILEGES ON *.* TO "+nombreUsuario+";" +
-                "INSERT INTO `lorazepam`.`usuarios` (`nombre`, `email`, `telefono`) VALUES ('"+nombreUsuario+"', '"+email+"', '"+telefono+"');");
+    public static void crearUsuario(String nombreUsuario, String hashedContrasenya, String email, int telefono) throws Exception {
+        PreparedStatement preparedStatement = conexion.prepareStatement("CREATE USER " + nombreUsuario + " IDENTIFIED BY '" + hashedContrasenya + "';");
+        try {
+            preparedStatement.execute();
+            preparedStatement = conexion.prepareStatement("GRANT ALL PRIVILEGES ON lorazepam.* TO '"+nombreUsuario+"'@'%' WITH GRANT OPTION;");
+            preparedStatement.execute();
+            preparedStatement = conexion.prepareStatement("INSERT INTO `lorazepam`.`usuarios` (`nombre`, `email`, `telefono`) VALUES ('"+nombreUsuario+"', '"+email+"', '"+telefono+"');");
+            preparedStatement.execute();
+        }catch (SQLException e){
+            System.out.println("ERROR: No se pudo crear el usuario (compruebe que no exista).");
+            e.printStackTrace();
+        }
+
+        System.out.println("Usuario "+nombreUsuario+" creado correctamente.");
+    }
+
+    public static void eliminarUsuario (String nombreUsuario) throws Exception{
+        PreparedStatement preparedStatement = conexion.prepareStatement("REVOKE ALL PRIVILEGES ON lorazepam.* FROM '"+nombreUsuario+"'@'%';");
+        try{
+            preparedStatement.execute();
+            conexion.prepareStatement("DROP USER '"+nombreUsuario+"'@'%'");
+            preparedStatement.execute();
+            conexion.prepareStatement("DELETE FROM usuarios WHERE nombre LIKE '"+nombreUsuario+"'@'%'");
+            preparedStatement.execute();
+        }catch (Exception e){
+            System.out.println("No se ha podido eliminar el usuario "+ nombreUsuario+ ".");
+            e.printStackTrace();
+        }
+
+        System.out.println("Se ha eliminado el usuario "+nombreUsuario+".");
     }
 
     @Override

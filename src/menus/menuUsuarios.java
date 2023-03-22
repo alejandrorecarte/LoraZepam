@@ -23,7 +23,7 @@ public class menuUsuarios {
                 break;
             case 1:
                 System.out.println("Escribe el nombre del usuario");
-                String nombre = sc.next();
+                String nombreCrear = sc.next();
                 System.out.println("Escribe la contraseña");
                 String hashContrasenya = Conexion.hashPassword(sc.next());
                 System.out.println("Vuelve a escribir la contraseña");
@@ -38,11 +38,22 @@ public class menuUsuarios {
                 int telefono = sc.nextInt();
 
                 try {
-                    Usuario.crearUsuario(nombre, hashContrasenya, email, telefono);
+                    Usuario.crearUsuario(nombreCrear, hashContrasenya, email, telefono);
                 }catch(Exception e){
                     e.printStackTrace();
                 }
                 break;
+            case 3:
+                System.out.println("Escribe el nombre del usuario");
+                String nombreEliminar = sc.next();
+                System.out.println("¿Seguro que desea eliminar al usuario "+nombreEliminar+" (s/n)?");
+                if(sc.next().equals("s")) {
+                    try {
+                        Usuario.eliminarUsuario(nombreEliminar);
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
         }
     }
 }
